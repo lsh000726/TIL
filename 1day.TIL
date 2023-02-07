@@ -22,3 +22,36 @@ range사용 법
 
 -추가 사항-
 개인적으로 문제시 하는 것은 만약에 네이버영화의 모든 데이터를 가져오고 싶다면 레인지 값을 데이터가 끊기는 지점에 멈춰야할 텐데 이것을 어떻게 구연할지 고민이 있으며, 이 점을 며칠 안에 만들어볼 계획이다. 
+어제의 개정본을 토대로 모든 데이터 값을 가져올 수 있도록 레인지를 사용하는 것이 아닌 단순한 알고리즘을 사용하는 것으로 수정을 해보았다
+
+-개정본2-
+while 800 < int(cf):
+
+  aa += 1
+  data = requests.get(link_a + str(aa), headers=headers)
+
+  soup = BeautifulSoup(data.text, 'html.parser')
+
+  movies = soup.select('#old_content > table > tbody > tr')
+
+  for movie in movies:
+    title = movie.select_one('td.title > div > a')
+    if title is not None:
+      a = movie.select_one('td > img')['alt']
+      b = title.text
+      c = movie.select_one('td.point').text
+
+      print(a, b, c)
+
+      cf = re.sub(r'[^0-9]', '', c)
+      int(cf)
+      aa + + 1
+
+-배운 것-
+파이썬 실수형과 정수형
+re.sub사용 법 (문자 열에서 숫자만 추출하는 법)
+
+-추가 사항-
+아직 코드가 너무 지저분 한 것 같다. 나도 보기 편하지 않기 때문에 이 점을 이번 항해99를 통해 고쳐나가고 싶다.
+일종의 한계점인 것 같은데 네이버에서 8.2평점 까지만 볼 수 있었다. 바로 뽀로로극장판까지만 나오고 그 뒤로는 크롤링이 안되었다.
+더 좋은 데이터 베이스를 찾아서 더 많은 데이터를 받아보는 연습을 하고 나중에는 가공까지 하고 싶다.
