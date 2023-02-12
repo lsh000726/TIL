@@ -1,0 +1,58 @@
+정말 많은 변화를 얻은 날인 것 같다.
+밤을 새며 여러 코드를 짜면서 많이 성장하였다.
+
+우선 ajax의 post와 get 방식을 어느 정도 이해하였다.
+
+두 번쨰로 로그인 기능과 회원가입 기능 구현이 가능해졌으며
+
+
+@app.route('/signup/new', methods=['POST'])
+def signup_new():
+    id_receive = request.form['id_give']
+    nickname_receive = request.form['nickname_give']
+    pw_receive = request.form['pw_give']
+    pw_pw_receive = request.form['pw_pw_give']
+    register_count = request.form['rc_give']
+
+    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
+
+    if register_count == 'success' :
+        if pw_receive != pw_pw_receive :
+            return jsonify({ 'result' : 'fail', 'msg': '패스워드가 일치하지 않습니다!'})
+        else:
+
+            db.user.insert_one({'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive})
+
+            return jsonify({ 'result' : 'success', 'msg': '회원가입에 성공하였습니다.'})
+    else :
+        return jsonify({ 'result' : 'fail', 'msg': "중복확인을 먼저 해주세요"})
+
+
+
+아이디 중복확인과 쿠키 생성 및 토큰 생성을 배웠다.
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    id_receive = request.form['id_give']
+    pw_receive = request.form['pw_give']
+
+    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
+
+    result = db.user.find_one({'id': id_receive, 'pw': pw_hash})
+
+    if result is not None:
+
+        payload = {
+            'id': id_receive,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds =5)
+        }
+
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+
+        # token을 줍니다.
+        return jsonify({'result': 'success', 'token': token})
+    # 찾지 못하면
+    else:
+        return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
+
+토큰을 이해하며 암호화의 기본적인 방식을 이해하였다.
